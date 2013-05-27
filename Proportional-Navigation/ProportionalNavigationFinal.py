@@ -30,11 +30,11 @@ uMT=uT-uM
 vMT=vT-vM
 xMT=xT-xM
 yMT=yT-yM
-velC=-((xMT*uMT + yMT*vMT)/rMT)
+velC=-((xMT*uMT + yMT*vMT)/rMT)                     #closing velocity
 
 
 lamdaD=(xMT*vMT - uMT*uMT)/(rMT**2)
-nC=Np*velC*lamdaD
+nC=Np*velC*lamdaD                                   #acceleration command to missile
 uMD=nC*np.sin(lamda)
 vMD=nC*np.cos(lamda)
 
