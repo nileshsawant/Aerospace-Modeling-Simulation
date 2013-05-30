@@ -121,7 +121,7 @@ print('\n\n mach no. is ',M)
 
 print('\n\n V, Ro & T are ',V,'\n\n',  Ro,'\n\n', T)
 
-print('\n\n Iterations required = ',itr-1, '\n\n Time = ',t, ' seconds')
+print('\n\n Iterations required = ',itr-1, '\n\n Time = ',t, ' (non-dimensionalized) ')
 
 plt.plot(np.arange(itr),Mdata,'-',np.arange(itr),Mdataex,'-',np.arange(itr),Mdatain,'-')
 plt.xlabel('X coordinate -->  Iterations')
