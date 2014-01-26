@@ -1,3 +1,4 @@
+#'cholesky-like' algorithm for non-symmetric martices
 import numpy as np,time
 
 dim=1000
