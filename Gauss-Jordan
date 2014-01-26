@@ -1,0 +1,49 @@
+#Gauss-Jordan Algorithm
+import numpy as np,time
+
+dim=1000
+
+A=np.random.rand(dim,dim)
+B=np.random.rand(dim,1)
+
+#Algorithm to solve Ax=B 
+def gaussjordan(A):    
+    A=A.astype(float)
+    m,n=A.shape
+    I=np.eye(m,n)
+    I=I.astype(float)   
+    
+    c=-1
+    while(c<n):
+        c=c+1
+        i=m-1
+        while(i>c):
+            I[i,:]=I[i,:]-I[c,:]*(A[i,c]/A[c,c])
+            A[i,:]=A[i,:]-A[c,:]*(A[i,c]/A[c,c])
+            i=i-1
+    c=n
+    while(c>0):
+        c=c-1
+        i=0
+        while(i<c):
+            I[i,:]=I[i,:]-I[c,:]*(A[i,c]/A[c,c])
+            A[i,:]=A[i,:]-A[c,:]*(A[i,c]/A[c,c])
+            i=i+1
+    i=0
+    while(i<m):
+        I[i,:]=I[i,:]*(1/A[i,i])
+        A[i,:]=A[i,:]*(1/A[i,i])
+        i=i+1       
+    return(I)            
+    
+if __name__=='__main__':
+    t0=time.clock()
+    X=np.dot(gaussjordan(A),B)
+    T=time.clock()-t0
+    print('\n Input Matrix A is: \n',A)
+    print('\n Input Matrix B is: \n',B)
+    print('\n Solution is: \n',X)
+    print('\n norm is ',np.linalg.norm(X,1))
+    print('\n delta norm', abs(np.linalg.norm(X,1)-np.linalg.norm(np.linalg.solve(A,B),1)))
+    print('\n Time taken (seconds) ',T)
+
