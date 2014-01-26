@@ -1,0 +1,228 @@
+#This was an attempt to solve flow over flat plate which could
+#not be completed due to time constraints
+#Boundary Conditions have not been applied in this code
+#This could be a very coarse framework for cfd.
+#Needed:Boundary Conditions,grid transformations,higher accuracy or order schemes
+#
+#
+import numpy as np,scipy as sp,matplotlib.pyplot as plt
+from scipy.integrate import ode
+
+def cd2dx(u,dx):
+    aa,bb,cc=u.shape
+    dux=[]
+    #print('\n cc set to: ',cc)
+    for i in range(0,cc):       
+        if i==0:
+            ux=(u[:,:,i+1]-u[:,:,i])/(dx)
+        elif i==cc-1:
+            ux=(u[:,:,i]-u[:,:,i-1])/(dx)
+        else:
+            ux=(u[:,:,i+1]-u[:,:,i-1])/(2*dx)        
+        dux.append(ux.T)  
+    return np.asarray(dux).T
+    
+def cd2dy(u,dy):
+    aa,bb,cc=u.shape
+    duy=[]
+    #print('\n cc set to: ',cc)
+    for i in range(0,bb):       
+        if i==0:
+            uy=(u.T[:,i+1,:]-u.T[:,i,:])/(dy)
+        elif i==bb-1:
+            uy=(u.T[:,i,:]-u.T[:,i-1,:])/(dy)
+        else:
+            uy=(u.T[:,i+1,:]-u.T[:,i-1,:])/(2*dy)        
+        duy.append(uy)
+    duy=np.asarray(duy).T
+    duuy=[]
+    for k in range(0,aa):
+        duuy.append(duy[k,:,:].T)
+    return np.asarray(duuy)
+    
+def cd2dx2(u,dx):
+    bb,cc=u.shape
+    dux=[]
+    #print('\n cc set to: ',cc)
+    for i in range(0,cc):       
+        if i==0:
+            ux=(u[:,i+1]-u[:,i])/(dx)
+        elif i==cc-1:
+            ux=(u[:,i]-u[:,i-1])/(dx)
+        else:
+            ux=(u[:,i+1]-u[:,i-1])/(2*dx)        
+        dux.append(ux)  
+    return np.asarray(dux).T
+    
+def cd2dy2(u,dy):
+    bb,cc=u.shape
+    duy=[]
+    #print('\n cc set to: ',cc)
+    for i in range(0,bb):       
+        if i==0:
+            uy=(u[i+1,:]-u[i,:])/(dy)
+        elif i==bb-1:
+            uy=(u[i,:]-u[i-1,:])/(dy)
+        else:
+            uy=(u[i+1,:]-u[i-1,:])/(2*dy)        
+        duy.append(uy)  
+    return np.asarray(duy)
+    
+def fun(t,u):
+	return -c1*dFx-c2*dGy
+    
+		
+if __name__=='__main__':
+	open('results.txt','w')
+	xx=np.zeros(800)+1.0
+	yy=np.zeros(1000)+1.0
+	xy=np.zeros([len(yy),len(xx)])+1
+	Xaxis=np.arange(len(xx))
+	yaxis=np.arange(len(yy))
+	c1=1
+	c2=1
+	delT=dt=0.000001
+	dx=1
+	dy=1
+	Tin=t_in=0
+	T=t_fin=1
+	
+	k=0.0257
+	Rair=287.16
+	Cv=0.718
+	mu=1.7e-5
+	rho=xy*1.2256
+						
+	vx=xy*20.0	
+	vy=xy*0.0
+	vz=xy*0
+	
+	vy[400:600,400:402]=0	#BC
+	vx[400:600,400:402]=0	#BC
+	#vx[:,0]=200				#BC
+	#vy[:,0]=0				#BC
+	#vx[0,1:-2]=vy[0,1:-2]=0		#BC
+	#vx[-1,1:-2]=vy[-1,1:-2]=0		#BC
+	
+	#vx[:,-1]=				#BC
+	#vy[:,-1]=0				#BC
+	
+	V=np.sqrt(vx**2+vy**2+vz**2)	
+	p=xy*101325.0
+	#p[:,-1]=0				#BC						
+	#p[:,0]=101325.0			#BC		
+	Tair=p/(rho*Rair)				
+	e=Cv*Tair						
+	
+	dTx=xy*0
+	dTy=xy*0
+	towxx=(2*mu*(cd2dy2(vx,dy))-p)
+	towyy=(2*mu*(cd2dx2(vy,dx))-p)
+	towxy=towyx=(mu*(cd2dy2(vx,dy)+cd2dx2(vy,dx)))
+	
+	#BC()
+	#vy[180:220,130:132]=0
+	#vx[180:220,130:132]=0
+	
+	
+	
+
+	
+	
+	
+	u=np.array([rho,rho*vx,rho*vy,rho*(e+((V**2)/2))])#.T	
+	F=np.array([rho*vx,(rho*(vx**2)+p-towxx),(rho*vx*vy-towxy),(rho*vx*(e+((V**2)/2))+p*vx-k*dTx-vx*towxx-vy*towxy)])#.T
+	G=np.array([rho*vy,(rho*vx*vy-towyx),(rho*(vy**2)+p-towyy),(rho*vy*(e+((V**2)/2))+p*vy-k*dTy-vx*towyx-vy*towyy)])#.T
+	
+	plt.pcolormesh(V)
+	plt.colorbar()
+	plt.savefig('Vinitial')
+	plt.clf()
+	
+	imc=0	
+	for j in np.arange(t_in+dt,t_fin+dt,dt):
+		
+		dFx=cd2dx(F,dx)
+		dGy=cd2dy(G,dy)
+
+				
+		#RK4		
+		k1=fun(Tin,u)
+		k2=fun(Tin+0.5*delT,u+0.5*delT*k1)
+		k3=fun(Tin+0.5*delT,u+0.5*delT*k2)
+		k4=fun(Tin+delT,u+delT*k3)
+		u=u+delT*((k1/6)+(k2/3)+(k3/3)+(k4/6))
+
+		#print('\n\n',u,'\n')		
+		rho=u[0,:,:]
+		vx=u[1,:,:]/rho
+		vy=u[2,:,:]/rho
+		
+		vy[400:600,400:402]=0	#BC
+		vx[400:600,400:402]=0	#BC
+		#vx[:,0]=200				#BC
+		#vy[:,0]=0				#BC
+		#vx[0,1:-2]=vy[0,1:-2]=0		#BC
+		#vx[-1,1:-2]=vy[-1,1:-2]=0	#BC
+	
+		#vx[:,-1]=				#BC
+		#vy[:,-1]=0				#BC
+		
+		V=np.sqrt(vx**2+vy**2+vz**2)
+		e=(u[3,:,:]/rho)-((V**2)/2)
+		Tair=e/Cv
+		p=rho*Rair*Tair
+		#p[:,-1]=0				#BC
+		#p[:,0]=101325.0			#BC	
+		
+		dTx=xy*0
+		dTy=xy*0
+		towxx=(2*mu*(cd2dy2(vx,dy))-p)
+		towyy=(2*mu*(cd2dx2(vy,dx))-p)
+		towxy=towyx=(mu*(cd2dy2(vx,dy)+cd2dx2(vy,dx)))
+			
+		
+		bb='\nrho='+str(rho)+'\nvx='+str(vx)+'\nV='+str(V)+'\ne='+str(e)+'\nTair='+str(Tair)+'\np='+str(p)
+		aa='Time is: '+str(j)
+		
+		with open('results.txt','a') as out_file:
+			out_file.write('\n\n')
+			out_file.write(aa)
+			out_file.write(bb)
+			out_file.write('\n ----------- \n')
+			
+		imc=imc+1
+		if imc>10:
+			imc=0			
+			
+		if imc>9:
+		#if 1:
+			plt.title('time='+str(j))
+
+			plt.pcolormesh(V)
+			plt.colorbar()
+			plt.savefig('VOutatT'+str(int(j*10000000)))
+			#plt.show()
+			plt.clf()
+			
+		#BC()
+		#BC()
+		#vy[180:220,130:132]=0
+		#vx[180:220,130:132]=0
+		
+
+	
+
+
+		
+		F=np.array([rho*vx,(rho*(vx**2)+p-towxx),(rho*vx*vy-towxy),(rho*vx*(e+((V**2)/2))+p*vx-k*dTx-vx*towxx-vy*towxy)])#.T
+		G=np.array([rho*vy,(rho*vx*vy-towyx),(rho*(vy**2)+p-towyy),(rho*vy*(e+((V**2)/2))+p*vy-k*dTy-vx*towyx-vy*towyy)])#.T
+		
+			
+	
+
+	
+	
+	
+	
+	
