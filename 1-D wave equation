@@ -1,0 +1,53 @@
+#Algorithm for wave eqn Ut+c*Ux=0
+
+import numpy as np,scipy as sp,matplotlib.pyplot as plt
+#from scipy.integrate import ode
+
+def cd2(u,dx):
+    dux=[]  
+    for i in range(0,len(u)):       
+        if i==0:
+            ux=(u[i+1]-u[i])/(dx)
+        elif i==len(u)-1:
+            ux=(u[i]-u[i-1])/(dx)
+        else:
+            ux=(u[i+1]-u[i-1])/(2*dx)        
+        dux.append(ux)  
+    return dux
+    
+def fun(t,u):
+	return c*np.asarray(dux)
+    
+		
+if __name__=='__main__':
+	c=2
+	delT=dt=0.01
+	dx=1
+	Tin=t_in=0
+	T=t_fin=0.09
+	xx=np.arange(0,10+dx,dx)
+	u=np.array([np.sin(xx),np.cos(xx),np.tan(xx)]).T
+	#plt.plot(xx,u[0,:],xx,u[1,:],xx,u[2,:]);plt.savefig('u-initial');plt.clf()
+	plt.plot(np.array([xx,xx,xx]).T,u);plt.savefig('u-initial');plt.clf()
+		
+	for p in np.arange(t_in+dt,t_fin+dt,dt):
+		
+		dux=cd2(u,dx)
+				
+		#RK4		
+		k1=fun(Tin,u)
+		k2=fun(Tin+0.5*delT,u+0.5*delT*k1)
+		k3=fun(Tin+0.5*delT,u+0.5*delT*k2)
+		k4=fun(Tin+delT,u+delT*k3)
+		u=u+delT*((k1/6)+(k2/3)+(k3/3)+(k4/6))
+
+		print('\n\n',u)
+		plt.title('time='+str(p))
+		plt.plot(np.array([xx,xx,xx]).T,u);plt.savefig('UatT'+str(int(p*10000)));plt.clf()	
+	
+
+	
+	
+	
+	
+	
