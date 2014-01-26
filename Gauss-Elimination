@@ -1,0 +1,45 @@
+#Gauss elimination algorithm
+import numpy as np,time
+
+dim=1000
+
+A=np.random.rand(dim,dim)
+B=np.random.rand(dim,1)
+
+#Algorithm to solve Ax=B 
+def gaussel(A,B):
+    t0=time.clock()
+    A=A.astype(float)
+    m,n=A.shape
+    X=np.zeros(m).T
+    B=B.astype(float)
+    
+    c=-1
+    while(c<n):
+        c=c+1
+        i=m-1
+        while(i>c):
+            B[i]=B[i]-B[c]*(A[i,c]/A[c,c])
+            A[i,:]=A[i,:]-A[c,:]*(A[i,c]/A[c,c])
+            i=i-1
+
+    while(i>=0):
+        p=0
+        c=i+1
+        while(c<n):
+            p=p+A[i,c]*X[c]
+            c=c+1
+        q=A[i,i]
+        X[i]=(B[i]-p)/q
+        i=i-1
+    T=time.clock()-t0        
+    return(A,B,X,T)            
+    
+if __name__=='__main__':
+    x,y,X,T=gaussel(A,B)
+    print('\n Input Matrix A is: \n',A)
+    print('\n Input Matrix B is: \n',B)    
+    print('\n Solution is: \n',X)
+    print('\n norm is ',np.linalg.norm(X,1))
+    print('\n delta norm', abs(np.linalg.norm(X,1)-np.linalg.norm(np.linalg.solve(A,B),1)))
+    print('\n Time taken (seconds) ',T)
