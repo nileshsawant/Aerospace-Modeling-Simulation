@@ -1,0 +1,32 @@
+#RK-4 Algorithm
+# Function definition
+def f(t,u):
+    return u/(t+1)
+
+#RK4 Definition
+def rk4(function,t_initial,u_initial,delta_t,t_final):
+    fun,Tin,Uin,delT,T=function,t_initial,u_initial,delta_t,t_final
+    print(fun,Tin,Uin,delT,T)
+
+    while Tin<T:
+            k1=fun(Tin,Uin)
+            
+            k2=fun(Tin+0.5*delT,Uin+0.5*delT*k1)
+            
+            k3=fun(Tin+0.5*delT,Uin+0.5*delT*k2)
+            
+            k4=fun(Tin+delT,Uin+delT*k3)
+            
+            Uin=Uin+delT*((k1/6)+(k2/3)+(k3/3)+(k4/6))
+            Tin=Tin+delT
+            print('Value is ', Uin,' At time step= ',Tin)
+            
+
+if __name__=="__main__":
+    function=f      #function to integrate
+    t_initial=0     #initial time
+    u_initial=10     #initial u
+    delta_t=0.5     #time step
+    t_final=10       #final time
+
+    rk4(function,t_initial,u_initial,delta_t,t_final)
