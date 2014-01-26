@@ -1,0 +1,85 @@
+#Root-finding functions
+def f(x):
+    return x**2-7*x+12   #function
+def f1(x):
+    return 2*x-7         #derivative of the function
+
+def nr(f,f1,xi):
+    itr=0
+    while f(xi)**2>tol**2:
+        xi=xi-(f(xi)/f1(xi))
+        print('By newton rapson \n Root is at x= ',xi)
+        print('Value of function at the root =',f(xi))
+        itr=itr+1
+        if(itr>maxitr-1):
+            print('\nUnstable!!!\n')
+            break
+
+def secant(f,xi,xj):
+    itr=0
+    while f(xi)**2>tol**2:
+        xroot=xi-((f(xi)*(xi-xj))/(f(xi)-f(xj)))
+        xj=xi+0
+        xi=xroot
+        print('By secant method \n Root is at x= ',xroot)
+        print('Value of function at the root =',f(xi))
+        itr=itr+1
+        if(itr>maxitr-1):
+            print('\nUnstable!!!\n')
+            break
+
+def falseposition(f,xi,xj):
+    itr=0
+    while f(xi)**2>tol**2:
+        xroot=xi-((f(xi)*(xi-xj))/(f(xi)-f(xj)))
+        if(f(xroot)*f(xi)> 0):
+            xj=xi+0
+            xi=xroot
+        else:
+            xj=xj+0
+            xi=xroot
+        print('By false position \n Root is at x= ',xroot)
+        print('Value of function at the root =',f(xi))
+        itr=itr+1
+        if(itr>maxitr-1):
+            print('\nUnstable!!!\n')
+            break
+        
+        
+
+if __name__=='__main__':
+    xi=2         #initial guess value
+    tol=1e-8       #tolerance
+    xj=-2           #other guess value for secant method
+
+    maxitr=50      #Max permissable iterations per method
+    
+    
+    try:
+        nr(f,f1,xi)
+        print('\n\n\n')
+    except ZeroDivisionError:
+        print('\nDivide by Zero error encountered!!!\n')
+        pass
+
+    try:
+        secant(f,xi,xj)
+        print('\n\n\n')
+    except ZeroDivisionError:
+        print('\nDivide by Zero error encountered!!!\n')
+        pass
+
+    try:
+        falseposition(f,xi,xj)
+        print('\n\n\n')
+    except ZeroDivisionError:
+        print('\nDivide by Zero error encountered!!!\n')
+        pass
+    
+    print('\n\n\n')
+    
+
+
+    
+
+
