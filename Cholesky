@@ -1,0 +1,62 @@
+import numpy as np,time
+
+dim=1000
+
+A=np.random.rand(dim,dim)
+B=np.random.rand(dim,1)
+
+#Algorithm to solve Ax=B 
+def cholesky(A,B):
+    t0=time.clock()
+    A=A.astype(float)
+    m,n=A.shape
+    X=np.zeros(m).T
+    B=B.astype(float)
+    L=np.eye(m,n)
+    L=L.astype(float)   
+    
+    c=-1
+    while(c<n):
+        c=c+1
+        i=m-1
+        while(i>c):
+            L[i,c]=(A[i,c]/A[c,c])            
+            A[i,:]=A[i,:]-A[c,:]*(A[i,c]/A[c,c])
+            i=i-1
+    i=0
+    while(i<m):
+        p=0
+        c=0
+        while(c<i):
+            p=p+L[i,c]*X[c]
+            c=c+1
+        q=L[i,i]
+        X[i]=(B[i]-p)/q
+        i=i+1
+    Y=X
+    i=m-1
+    X=np.zeros(m).T
+    while(i>=0):
+        p=0
+        c=i+1
+        while(c<n):
+            p=p+A[i,c]*X[c]
+            c=c+1
+        q=A[i,i]
+        X[i]=(Y[i]-p)/q
+        i=i-1  
+    T=time.clock()-t0
+    return(A,B,X,L,T)            
+    
+if __name__=='__main__':    
+        x,y,X,L,T=cholesky(A,B)
+        print('\n Input Matrix A is: \n',A)
+        print('\n Input Matrix B is: \n',B)    
+        print('\n Solution is: \n',X)
+        print('\n norm is ',np.linalg.norm(X,1))
+        print('\n delta norm', abs(np.linalg.norm(X,1)-np.linalg.norm(np.linalg.solve(A,B),1)))
+        print('\n Time taken (seconds) ',T)
+        
+        
+    
+
